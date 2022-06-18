@@ -5,8 +5,20 @@ const catchAsync = require('../utils/catchAsync');
 const { userService } = require('../services');
 
 const createUser = catchAsync(async (req, res) => {
-  const user = await userService.createUser(req.body);
-  res.status(httpStatus.CREATED).send(user);
+  const {body} = req;
+  const attach = await userService.createUser(body);
+  console.log(req.files)
+  if (req.files) {
+    let path = '';
+    req.files.forEach(function (files, index, arr) {
+      path = "resumes/"+ files.filename
+      // console.log(files.filename)
+    });
+  
+    attach.resume = path;
+  }
+  res.status(httpStatus.CREATED).send(attach);
+  await attach.save();
 });
 
 const getUsers = catchAsync(async (req, res) => {
